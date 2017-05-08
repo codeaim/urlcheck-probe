@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Provision AWS CloudWatch events, AWS SNS topics and AWS Lambda functions to preform url monitoring
+Parameters:
+  ApiUrlParameter: {Description: Enter urlcheck api url., Type: String}
+  ChunkSizeParameter: {Description: Enter acquire check chunk size., Type: Number}
+  ChecksTopicParameter: {Description: Enter checks sns topic arn., Type: String}
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: ['sts:AssumeRole']
+          Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com, apigateway.amazonaws.com]
+        Version: '2012-10-17'
+      ManagedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole']
+      Path: /
+  FunctionCheckAcquire:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: {S3Bucket: urlcheck-probe, S3Key: deploy.zip}
+      Environment:
+        Variables:
+          API_URL: {Ref: ApiUrlParameter}
+          CHUNK_SIZE: {Ref: ChunkSizeParameter}
+          CHECKS_TOPIC: {Ref: ChecksTopicParameter}
+      FunctionName: urlcheck-check-acquire
+      Handler: index.checkAcquire
+      MemorySize: 128
+      Role:
+        Fn::GetAtt: [LambdaExecutionRole, Arn]
+      Runtime: nodejs6.10
+      Timeout: 10
+    
