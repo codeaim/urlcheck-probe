@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Provision AWS CloudWatch events, AWS SNS topics and AWS Lambda functions to preform url monitoring
+Description: Provision AWS CloudWatch events, AWS SNS subjects and AWS Lambda functions to preform url monitoring
 Parameters:
   ApiUrlParameter: {Description: Enter urlcheck api url., Type: String}
   ChunkSizeParameter: {Description: Enter acquire check chunk size., Type: Number}
@@ -13,10 +13,22 @@ Resources:
         - Action: ['sts:AssumeRole']
           Effect: Allow
           Principal:
-            Service: [lambda.amazonaws.com, apigateway.amazonaws.com]
+            Service: [lambda.amazonaws.com, sns.amazonaws.com]
         Version: '2012-10-17'
       ManagedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole']
       Path: /
+  LambdaExecutionPolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyName: LambdaPublishSNS
+        Roles:
+          - Ref: LambdaExecutionRole
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: ['sns:Publish']
+              Resource: '*'
   FunctionCheckAcquire:
     Type: AWS::Lambda::Function
     Properties:
