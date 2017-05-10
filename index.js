@@ -44,3 +44,11 @@ module.exports.checkAcquire = (event, context, callback) => {
         callback(error);
     });
 };
+
+module.exports.checkProbe = (event, context, callback) => {
+    const checks = JSON.parse(event.Records[0].Sns.Message);
+    checks.map((check) => {
+        console.log(`check: ${JSON.stringify(check)}`);
+    });
+    callback();
+};
