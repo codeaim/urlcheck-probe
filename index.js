@@ -21,6 +21,8 @@ module.exports.checkAcquire = (event, context, callback) => {
         timeout: 1000
     });
 
+    console.log(`Acquiring candidates from ${process.env.API_URL} for region ${region}`);
+
     http.post('/candidate', {
         region: region
     }).then((response) => {
@@ -47,8 +49,20 @@ module.exports.checkAcquire = (event, context, callback) => {
 
 module.exports.checkProbe = (event, context, callback) => {
     const checks = JSON.parse(event.Records[0].Sns.Message);
-    checks.map((check) => {
-        console.log(`check: ${JSON.stringify(check)}`);
+    const http = axios.create({
+        timeout: 10000
     });
+    const checkRequests = checks.map((check) => {
+        console.log(`check: ${JSON.stringify(check)}`);
+        return http.get(`${check.protocol}://${check.url}`);
+    });
+
+    axios.all(checkRequests)
+        .then((results) => {
+            results.map((result) => {
+                console.log(`result json: ${JSON.stringify(result)}`)
+            });
+        });
+
     callback();
 };

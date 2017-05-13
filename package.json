@@ -1,4 +1,18 @@
 {
+  "name": "urlcheck-probe",
+  "config": {
+    "api-url": "",
+    "chunk-size": 5
+  },
+  "scripts": {
+    "update-stack": "aws cloudformation update-stack --stack-name urlcheck-probe --template-url https://s3.amazonaws.com/urlcheck-probe/template.yml --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api-url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk-size && aws cloudformation wait stack-update-complete --stack-name urlcheck-probe",
+    "create-stack": "aws cloudformation create-stack --stack-name urlcheck-probe --template-url https://s3.amazonaws.com/urlcheck-probe/template.yml --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api-url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk-size && aws cloudformation wait stack-create-complete --stack-name urlcheck-probe",
+    "upload-template": "aws s3 cp template.yml s3://urlcheck-probe/template.yml",
+    "upload-deploy": "zip -r deploy.zip index.js node_modules && aws s3 cp deploy.zip s3://urlcheck-probe/deploy.zip",
+    "create": "npm run upload-deploy && npm run upload-swagger && npm run upload-template && npm run create-stack",
+    "update": "npm run upload-deploy && npm run upload-swagger && npm run upload-template && npm run update-stack",
+    "delete": "aws cloudformation delete-stack --stack-name urlcheck-probe && aws cloudformation wait stack-delete-complete --stack-name urlcheck-probe"
+  },
   "dependencies": {
     "aws-sdk": "^2.49.0",
     "axios": "^0.16.1"
