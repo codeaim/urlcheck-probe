@@ -35,7 +35,7 @@ Resources:
       Environment:
         Variables:
           API_URL: {Ref: ApiUrlParameter}
-      FunctionName: urlcheck-check-probe
+      FunctionName: urlcheck-probe-check-probe
       Handler: index.checkProbe
       MemorySize: 128
       Role:
@@ -67,7 +67,7 @@ Resources:
           API_URL: {Ref: ApiUrlParameter}
           CHUNK_SIZE: {Ref: ChunkSizeParameter}
           CHECKS_TOPIC: {Ref: TopicChecks}
-      FunctionName: urlcheck-check-acquire
+      FunctionName: urlcheck-probe-check-acquire
       Handler: index.checkAcquire
       MemorySize: 128
       Role:

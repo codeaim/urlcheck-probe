@@ -36,7 +36,8 @@ npm install
 
 Set deployment configuration with valid values
 ```bash
-npm config set urlcheck-probe:api-url=<api-url>
+npm config set urlcheck-probe:api_url=<api_url>
+npm config set urlcheck-probe:chunk_size=<chunk_size>
 ```
 
 Produce deployment package. Upload deployment package & AWS CloudFormation template to AWS S3 bucket. Create AWS CloudFormation stack and wait for completion.
