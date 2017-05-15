@@ -18,7 +18,7 @@ module.exports.checkAcquire = (event, context, callback) => {
     const sns = new AWS.SNS();
     const http = axios.create({
         baseURL: process.env.API_URL,
-        timeout: 1000
+        timeout: 10000
     });
 
     console.log(`Acquiring candidates from ${process.env.API_URL} for region ${region}`);
@@ -51,7 +51,7 @@ module.exports.checkProbe = (event, context, callback) => {
     const checks = JSON.parse(event.Records[0].Sns.Message);
     const http = axios.create({
         baseURL: process.env.API_URL,
-        timeout: 10000
+        timeout: 6000
     });
 
     http.interceptors.request.use((config) => {
