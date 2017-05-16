@@ -19,7 +19,11 @@ module.exports.checkProbe = (event, context, callback) => {
 
     const checkRequests = checks.map((check) => {
         console.log(`Probe check ${check.id} requesting ${check.protocol}://${check.url}`);
-        return http.get(`${check.protocol}://${check.url}`, {"id": check.id});
+        return http.get(`${check.protocol}://${check.url}`, {
+            "id": check.id,
+            "previousStatus": check.status,
+            "confirming": check.confirming
+        });
     });
 
     axios.all(checkRequests)
@@ -27,6 +31,8 @@ module.exports.checkProbe = (event, context, callback) => {
             const checkStatuses = results.map((result) => {
                 return {
                     "id": result.config.id,
+                    "previousStatus": result.config.previousStatus,
+                    "confirming": result.config.confirming,
                     "statusCode": result.status,
                     "responseTime": result.responseTime,
                     "region": process.env.AWS_DEFAULT_REGION
