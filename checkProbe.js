@@ -33,6 +33,7 @@ module.exports.checkProbe = (event, context, callback) => {
                     "id": result.config.id,
                     "previousStatus": result.config.previousStatus,
                     "confirming": result.config.confirming,
+                    "status": result.status < 400 ? 'UP' : 'DOWN',
                     "statusCode": result.status,
                     "responseTime": result.responseTime,
                     "region": process.env.AWS_DEFAULT_REGION
