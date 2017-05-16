@@ -8,7 +8,7 @@
     "update-stack": "aws cloudformation update-stack --stack-name urlcheck-probe --template-url https://s3.amazonaws.com/urlcheck-probe/template.yml --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api_url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk_size && aws cloudformation wait stack-update-complete --stack-name urlcheck-probe",
     "create-stack": "aws cloudformation create-stack --stack-name urlcheck-probe --template-url https://s3.amazonaws.com/urlcheck-probe/template.yml --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api_url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk_size && aws cloudformation wait stack-create-complete --stack-name urlcheck-probe",
     "upload-template": "aws s3 cp template.yml s3://urlcheck-probe/template.yml",
-    "upload-deploy": "zip -r deploy.zip index.js node_modules && aws s3 cp deploy.zip s3://urlcheck-probe/deploy.zip",
+    "upload-deploy": "zip -r deploy.zip checkProbe.js checkAcquire.js node_modules && aws s3 cp deploy.zip s3://urlcheck-probe/deploy.zip",
     "create": "npm run upload-deploy && npm run upload-template && npm run create-stack",
     "update": "npm run upload-template && npm run update-stack",
     "update-code": "npm run upload-deploy && aws lambda update-function-code --function-name urlcheck-probe-check-acquire --s3-bucket urlcheck-probe --s3-key deploy.zip && aws lambda update-function-code --function-name urlcheck-probe-check-probe --s3-bucket urlcheck-probe --s3-key deploy.zip",

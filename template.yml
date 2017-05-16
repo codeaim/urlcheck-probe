@@ -36,7 +36,7 @@ Resources:
         Variables:
           API_URL: {Ref: ApiUrlParameter}
       FunctionName: urlcheck-probe-check-probe
-      Handler: index.checkProbe
+      Handler: checkProbe.checkProbe
       MemorySize: 128
       Role:
         Fn::GetAtt: [LambdaExecutionRole, Arn]
@@ -68,7 +68,7 @@ Resources:
           CHUNK_SIZE: {Ref: ChunkSizeParameter}
           CHECKS_TOPIC: {Ref: TopicChecks}
       FunctionName: urlcheck-probe-check-acquire
-      Handler: index.checkAcquire
+      Handler: checkAcquire.checkAcquire
       MemorySize: 128
       Role:
         Fn::GetAtt: [LambdaExecutionRole, Arn]
