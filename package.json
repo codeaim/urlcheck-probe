@@ -1,18 +1,22 @@
 {
   "name": "urlcheck-probe",
   "config": {
+    "name": "urlcheck-probe-eu-west-2",
+    "region": "eu-west-2",
+    "template_url": "https://s3.amazonaws.com/urlcheck-probe-eu-west-2/template.yml",
     "api_url": "",
-    "chunk_size": ""
+    "chunk_size": "25"
   },
   "scripts": {
-    "update-stack": "aws cloudformation update-stack --stack-name urlcheck-probe --template-url https://s3.amazonaws.com/urlcheck-probe/template.yml --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api_url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk_size && aws cloudformation wait stack-update-complete --stack-name urlcheck-probe",
-    "create-stack": "aws cloudformation create-stack --stack-name urlcheck-probe --template-url https://s3.amazonaws.com/urlcheck-probe/template.yml --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api_url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk_size && aws cloudformation wait stack-create-complete --stack-name urlcheck-probe",
-    "upload-template": "aws s3 cp template.yml s3://urlcheck-probe/template.yml",
-    "upload-deploy": "zip -r deploy.zip checkProbe.js checkAcquire.js node_modules && aws s3 cp deploy.zip s3://urlcheck-probe/deploy.zip",
+    "update-stack": "aws --region $npm_package_config_region cloudformation update-stack --stack-name $npm_package_config_name --template-url $npm_package_config_template_url --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api_url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk_size ParameterKey=S3BucketParameter,ParameterValue=$npm_package_config_name ParameterKey=S3BucketParameter,ParameterValue=$npm_package_config_name && aws --region $npm_package_config_region cloudformation wait stack-update-complete --stack-name $npm_package_config_name",
+    "create-stack": "aws --region $npm_package_config_region cloudformation create-stack --stack-name $npm_package_config_name --template-url $npm_package_config_template_url --capabilities CAPABILITY_IAM --parameters ParameterKey=ApiUrlParameter,ParameterValue=$npm_package_config_api_url ParameterKey=ChunkSizeParameter,ParameterValue=$npm_package_config_chunk_size ParameterKey=S3BucketParameter,ParameterValue=$npm_package_config_name ParameterKey=S3BucketParameter,ParameterValue=$npm_package_config_name && aws --region $npm_package_config_region cloudformation wait stack-create-complete --stack-name $npm_package_config_name",
+    "upload-template": "aws --region $npm_package_config_region s3 cp template.yml s3://$npm_package_config_name/template.yml",
+    "upload-deploy": "zip -r deploy.zip checkProbe.js checkAcquire.js node_modules && aws --region $npm_package_config_region s3 cp deploy.zip s3://$npm_package_config_name/deploy.zip",
+    "setup": "aws s3api create-bucket --bucket $npm_package_config_name --region $npm_package_config_region --create-bucket-configuration LocationConstraint=$npm_package_config_region",
     "create": "npm run upload-deploy && npm run upload-template && npm run create-stack",
     "update": "npm run upload-template && npm run update-stack",
-    "update-code": "npm run upload-deploy && aws lambda update-function-code --function-name urlcheck-probe-check-acquire --s3-bucket urlcheck-probe --s3-key deploy.zip && aws lambda update-function-code --function-name urlcheck-probe-check-probe --s3-bucket urlcheck-probe --s3-key deploy.zip",
-    "delete": "aws cloudformation delete-stack --stack-name urlcheck-probe && aws cloudformation wait stack-delete-complete --stack-name urlcheck-probe"
+    "update-code": "npm run upload-deploy && aws --region $npm_package_config_region lambda update-function-code --function-name urlcheck-probe-check-acquire --s3-bucket $npm_package_config_name --s3-key deploy.zip && aws --region $npm_package_config_region lambda update-function-code --function-name urlcheck-probe-check-probe --s3-bucket $npm_package_config_name --s3-key deploy.zip",
+    "delete": "aws --region $npm_package_config_region cloudformation delete-stack --stack-name $npm_package_config_name && aws --region $npm_package_config_region cloudformation wait stack-delete-complete --stack-name $npm_package_config_name"
   },
   "dependencies": {
     "aws-sdk": "^2.49.0",

@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Provision AWS CloudWatch events, AWS SNS subjects and AWS Lambda functions to preform url monitoring
 Parameters:
+  S3BucketParameter: {Description: Enter S3 bucket name., Type: String}
   ApiUrlParameter: {Description: Enter urlcheck api url., Type: String}
   ChunkSizeParameter: {Description: Enter acquire check chunk size., Type: Number}
 Resources:
@@ -31,11 +32,17 @@ Resources:
   FunctionCheckProbe:
     Type: AWS::Lambda::Function
     Properties:
-      Code: {S3Bucket: urlcheck-probe, S3Key: deploy.zip}
+      Code:
+        S3Bucket: {Ref: S3BucketParameter}
+        S3Key: deploy.zip
       Environment:
         Variables:
           API_URL: {Ref: ApiUrlParameter}
-      FunctionName: urlcheck-probe-check-probe
+      FunctionName:
+        Fn::Join:
+          - ''
+          - - Ref: S3BucketParameter
+            - '-check-probe'
       Handler: checkProbe.checkProbe
       MemorySize: 128
       Role:
@@ -49,7 +56,11 @@ Resources:
         - Endpoint:
             Fn::GetAtt: [FunctionCheckProbe, Arn]
           Protocol: lambda
-      TopicName: acquired-checks
+      TopicName:
+        Fn::Join:
+          - ''
+          - - Ref: S3BucketParameter
+            - '-acquired-checks'
   LambdaTopicChecksInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -61,13 +72,19 @@ Resources:
   FunctionCheckAcquire:
     Type: AWS::Lambda::Function
     Properties:
-      Code: {S3Bucket: urlcheck-probe, S3Key: deploy.zip}
+      Code:
+        S3Bucket: {Ref: S3BucketParameter}
+        S3Key: deploy.zip
       Environment:
         Variables:
           API_URL: {Ref: ApiUrlParameter}
           CHUNK_SIZE: {Ref: ChunkSizeParameter}
           CHECKS_TOPIC: {Ref: TopicChecks}
-      FunctionName: urlcheck-probe-check-acquire
+      FunctionName:
+        Fn::Join:
+          - ''
+          - - Ref: S3BucketParameter
+            - '-check-acquire'
       Handler: checkAcquire.checkAcquire
       MemorySize: 128
       Role:
@@ -77,12 +94,20 @@ Resources:
   RuleScheduleCheckAcquire:
     Type: AWS::Events::Rule
     Properties:
-      Name: check-acquire-scheduler
+      Name:
+        Fn::Join:
+          - ''
+          - - Ref: S3BucketParameter
+            - '-check-acquire-scheduler'
       ScheduleExpression: rate(1 minute)
       Targets:
         - Arn:
             Fn::GetAtt: [FunctionCheckAcquire, Arn]
-          Id: check-acquire-scheduler
+          Id:
+            Fn::Join:
+              - ''
+              - - Ref: S3BucketParameter
+                - '-check-acquire-scheduler'
   InvokeLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:

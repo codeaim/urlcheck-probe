@@ -36,6 +36,9 @@ npm install
 
 Set deployment configuration with valid values
 ```bash
+npm config set urlcheck-probe:name=<name>
+npm config set urlcheck-probe:template_url=<template_url>
+npm config set urlcheck-probe:region=<region>
 npm config set urlcheck-probe:api_url=<api_url>
 npm config set urlcheck-probe:chunk_size=<chunk_size>
 ```
