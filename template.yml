@@ -3,7 +3,7 @@ Description: Provision AWS CloudWatch events, AWS SNS subjects and AWS Lambda fu
 Parameters:
   S3BucketParameter: {Description: Enter S3 bucket name., Type: String}
   ApiUrlParameter: {Description: Enter urlcheck api url., Type: String}
-  ChunkSizeParameter: {Description: Enter acquire check chunk size., Type: Number}
+  ChunkSizeParameter: {Description: Enter acquire check chunk size., Default: 25, Type: Number}
 Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -43,12 +43,12 @@ Resources:
           - ''
           - - Ref: S3BucketParameter
             - '-check-probe'
-      Handler: checkProbe.checkProbe
+      Handler: src/checkProbe.handler
       MemorySize: 128
       Role:
         Fn::GetAtt: [LambdaExecutionRole, Arn]
       Runtime: nodejs6.10
-      Timeout: 10
+      Timeout: 20
   TopicChecks:
     Type: AWS::SNS::Topic
     Properties:
@@ -85,12 +85,12 @@ Resources:
           - ''
           - - Ref: S3BucketParameter
             - '-check-acquire'
-      Handler: checkAcquire.checkAcquire
+      Handler: src/checkAcquire.handler
       MemorySize: 128
       Role:
         Fn::GetAtt: [LambdaExecutionRole, Arn]
       Runtime: nodejs6.10
-      Timeout: 10
+      Timeout: 20
   RuleScheduleCheckAcquire:
     Type: AWS::Events::Rule
     Properties:

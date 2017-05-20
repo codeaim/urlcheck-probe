@@ -11,7 +11,7 @@ const chunk = (array, size) => {
     return results
 };
 
-module.exports.checkAcquire = (event, context, callback) => {
+module.exports.handler = (event, context, callback) => {
     const region = process.env.AWS_DEFAULT_REGION;
     const topic = process.env.CHECKS_TOPIC;
     AWS.config.update({region: region});
@@ -23,7 +23,7 @@ module.exports.checkAcquire = (event, context, callback) => {
 
     console.log(`Acquiring candidates from ${process.env.API_URL + "/check/candidate"} for region ${region}`);
 
-    http.post('/check/candidate', {
+    http.post('/probe/candidate', {
         region: region
     }).then((response) => {
         if (response.data.length) {
